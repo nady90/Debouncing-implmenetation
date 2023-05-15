@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
 import "./App.css";
@@ -7,9 +7,17 @@ function App() {
   const [numbers, setNumbers] = useState([1, 2, 3]);
   const [debounceNumbers, setDebounceNumbers] = useState([1, 2, 3]);
   const [debounceTime, setDebounceTime] = useState(1000);
+  const shouldWait = useRef(false); // Must use useRef to avoid the value being reset to false on every render
 
   let timer;
+
   const debounceFn = (fn, time) => {
+    if (!shouldWait.current) {
+      fn();
+      shouldWait.current = true;
+      return;
+    }
+
     clearTimeout(timer);
     timer = setTimeout(fn, time);
   };
