@@ -7,14 +7,14 @@ function App() {
   const [numbers, setNumbers] = useState([1, 2, 3]);
   const [debounceNumbers, setDebounceNumbers] = useState([1, 2, 3]);
   const [debounceTime, setDebounceTime] = useState(1000);
-  const shouldWait = useRef(false); // Must use useRef to avoid the value being reset to false on every render
+  const [shouldWait, setShouldWait] = useState(false); // Same solution without the need for useRef. You can persist a value through useState.
 
   let timer;
 
   const debounceFn = (fn, time) => {
-    if (!shouldWait.current) {
+    if (!shouldWait) {
       fn();
-      shouldWait.current = true;
+      setShouldWait(true);
       return;
     }
 
@@ -44,6 +44,7 @@ function App() {
   const resetLists = () => {
     setNumbers([1, 2, 3]);
     setDebounceNumbers([1, 2, 3]);
+    setShouldWait(false);
   };
 
   return (
