@@ -6,11 +6,34 @@ import "./App.css";
 function App() {
   const [numbers, setNumbers] = useState([1, 2, 3]);
   const [debounceNumbers, setDebounceNumbers] = useState([1, 2, 3]);
+  const [throttleNumbers, setThrottleNumbers] = useState([1, 2, 3]);
   const [debounceTime, setDebounceTime] = useState(1000);
   const [shouldWait, setShouldWait] = useState(false); // Same solution without the need for useRef. You can persist a value through useState.
+  const [shouldThrottleWait, setShouldThrottleWait] = useState(false);
+
+  const throttleFn = (fn, time) => {
+    if (shouldThrottleWait) {
+      return;
+    }
+
+    fn();
+    setShouldThrottleWait(true);
+
+    setTimeout(() => {
+      setShouldThrottleWait(false);
+    }, time);
+  };
+
+  const handleThrottleClick = () => {
+    throttleFn(() => {
+      setThrottleNumbers([
+        ...throttleNumbers,
+        throttleNumbers[throttleNumbers.length - 1] + 1,
+      ]);
+    }, debounceTime);
+  };
 
   let timer;
-
   const debounceFn = (fn, time) => {
     if (!shouldWait) {
       fn();
@@ -30,7 +53,6 @@ function App() {
         debounceNumbers[debounceNumbers.length - 1] + 1,
       ]);
     }, debounceTime);
-    console.log(debounceNumbers);
   };
 
   const handleDebounceTimeChange = (event) => {
@@ -44,7 +66,9 @@ function App() {
   const resetLists = () => {
     setNumbers([1, 2, 3]);
     setDebounceNumbers([1, 2, 3]);
+    setThrottleNumbers([1, 2, 3]);
     setShouldWait(false);
+    setShouldThrottleWait(false);
   };
 
   return (
@@ -89,6 +113,14 @@ function App() {
         >
           Debounce Button
         </button>
+        <button
+          onClick={() => {
+            handleThrottleClick();
+          }}
+          className="throttle-btn"
+        >
+          Throttle Button
+        </button>
       </div>
       <div className="lists-container">
         <div className="normal-list">
@@ -101,6 +133,13 @@ function App() {
         <div className="debounce-list">
           <span>Debounce List: </span>
           {debounceNumbers.map((number) => {
+            return <span key={number}>{`${number} - `}</span>;
+          })}
+        </div>
+
+        <div className="throttle-list">
+          <span>Throttle List: </span>
+          {throttleNumbers.map((number) => {
             return <span key={number}>{`${number} - `}</span>;
           })}
         </div>
